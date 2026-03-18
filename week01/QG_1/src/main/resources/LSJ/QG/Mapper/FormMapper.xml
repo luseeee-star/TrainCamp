@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间-->
+<mapper namespace="LSJ.QG.Mapper.FormMapper">
+    <insert id="InsertForm" useGeneratedKeys="true" keyProperty="id">
+        insert into repair_form (userid, device_type,description,status,update_time)
+        values (#{userid}, #{device_type}, #{description}, #{status},#{update_time});
+    </insert>
+
+    <update id="UpdateForm">
+        update repair_form
+        <set>
+            <if test="status != null and status!= ''">
+                status = #{status},
+            </if>
+            <if test="update_time != null and update_time!= ''">
+                update_time = #{update_time},
+            </if>
+        </set>
+        where id = #{id};
+    </update>
+
+    <delete id="DeleteForm">
+        delete from repair_form where id = #{id};
+    </delete>
+
+    <select id="SelectAll" resultType="LSJ.QG.Pojo.Form">
+        select * from repair_form
+        <where>
+            <if test="userid != null and userid != ''">
+                AND userid = #{userid}
+            </if>
+        </where>;
+    </select>
+    <select id="SelectByStatus" resultType="LSJ.QG.Pojo.Form">
+        select * from repair_form where status = 0;
+    </select>
+    <select id="SelectById" resultType="LSJ.QG.Pojo.Form">
+        select * from repair_form
+        where
+            id = #{id}
+    </select>
+</mapper>
