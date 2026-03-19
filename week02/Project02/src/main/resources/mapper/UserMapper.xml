@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间-->
+<mapper namespace="lsj.gdut.project02.mapper.UserMapper">
+    <insert id="InsertUser" useGeneratedKeys="true" keyProperty="id">
+        insert into sys_user (userid, password, role,dorm_info)
+        values (#{userid}, #{password}, #{role}, #{dorm_info});
+    </insert>
+
+    <select id="SelectUser" resultType="lsj.gdut.project02.pojo.User">
+        select * from sys_user where userid = #{userid} and password = #{password};
+    </select>
+
+    <update id="UpdateUser">
+        update sys_user
+        <set>
+            <if test="password != null and password!= ''">
+                password = #{password},
+            </if>
+            <if test="dorm_info != null and dorm_info!= ''">
+                dorm_info = #{dorm_info},
+            </if>
+        </set>
+        where userid = #{userid};
+    </update>
+</mapper>
