@@ -2,8 +2,8 @@ package lsj.gdut.project02;
 
 import lsj.gdut.project02.pojo.Form;
 import lsj.gdut.project02.pojo.User;
-import lsj.gdut.project02.service.FormService;
-import lsj.gdut.project02.service.UserService;
+import lsj.gdut.project02.service.impl.FormServiceimpl;
+import lsj.gdut.project02.service.impl.UserServiceimpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -19,8 +19,8 @@ public class Project02Application {
     public static void main(String[] args) throws InterruptedException {
         ConfigurableApplicationContext context =SpringApplication.run(Project02Application.class, args);
 
-        UserService userService = context.getBean(UserService.class);
-        FormService formService = context.getBean(FormService.class);
+        UserServiceimpl userServiceimpl = context.getBean(UserServiceimpl.class);
+        FormServiceimpl formServiceimpl = context.getBean(FormServiceimpl.class);
         String WindowsMain = "===========================\n" +
                 "\uD83C\uDFE0 宿舍报修管理系统\n" +
                 "===========================\n" +
@@ -37,7 +37,7 @@ public class Project02Application {
                 String userid = sc.nextLine();
                 System.out.println("请输入密码");
                 String password = sc.nextLine();
-                User user = userService.SelectUser(userid,password);
+                User user = userServiceimpl.SelectUser(userid,password);
                 if(user!=null){
                     //登录成功，判断角色
                     System.out.print("登陆成功！用户为：");
@@ -45,11 +45,11 @@ public class Project02Application {
                     if(user.getUserid().matches(regex)){
                         System.out.println("学生");
                         Thread.sleep(500);
-                        StudentMenu(user,formService,userService);
+                        StudentMenu(user, formServiceimpl, userServiceimpl);
                     }else{
                         System.out.println("管理员");
                         Thread.sleep(500);
-                        ManagerMenu(user,formService,userService);
+                        ManagerMenu(user, formServiceimpl, userServiceimpl);
                     }
                 }else{
                     System.out.println("无用户数据，查询是否注册过");
@@ -85,7 +85,7 @@ public class Project02Application {
                         user.setUserid(userid);
                         user.setPassword(password1);
                         user.setRole(UserType);
-                        userService.registerUser(user);
+                        userServiceimpl.registerUser(user);
                         System.out.println("注册成功，请返回主界面登录");
                     }else {
                         System.out.println("密码不一致！");
@@ -102,7 +102,7 @@ public class Project02Application {
         }
     }
 
-    public static void StudentMenu(User user,FormService formService,UserService userService) throws InterruptedException {
+    public static void StudentMenu(User user, FormServiceimpl formServiceimpl, UserServiceimpl userServiceimpl) throws InterruptedException {
         String WindowStu = "===== 学生菜单 =====\n" +
                 "1. 绑定/修改宿舍\n" +
                 "2. 创建报修单\n" +
@@ -128,7 +128,7 @@ public class Project02Application {
                 if (isLegal) {
                     //第一次登录，绑定宿舍
                     user.setDorm_info(dorm_info);
-                    userService.UpdateUser(user);
+                    userServiceimpl.UpdateUser(user);
                     //调出学生页面
                     System.out.println("宿舍信息成功更新");
                     Thread.sleep(300);
@@ -151,13 +151,13 @@ public class Project02Application {
                 //0是未维修，1是维修中，2是已完成
                 form.setStatus(0);
                 form.setUpdate_time(upodate_time);
-                formService.InsertForm(form);
+                formServiceimpl.InsertForm(form);
                 System.out.println("创建成功！");
                 Thread.sleep(500);
 
             }else if(choice.equals("3")){
                 String userid = user.getUserid();
-                List<Form> forms = formService.SelectAll(userid);
+                List<Form> forms = formServiceimpl.SelectAll(userid);
                 System.out.println("你的报修单详细如下");
                 for(Form form:forms){
                     System.out.println(form);
@@ -166,7 +166,7 @@ public class Project02Application {
             }else if(choice.equals("4")){
                 System.out.println("请输入要取消的报修单id");
                 Integer id = Integer.parseInt(sc.nextLine());
-                formService.DeleteForm(id);
+                formServiceimpl.DeleteForm(id);
                 System.out.println("取消成功");
             }else if(choice.equals("5")){
                 System.out.println("请输入原密码");
@@ -180,7 +180,7 @@ public class Project02Application {
                     if(password1.equals(password2)){
                         //如果密码一致则可以添加
                         user.setPassword(password1);
-                        userService.UpdateUser(user);
+                        userServiceimpl.UpdateUser(user);
                     }
                 }
             }else if(choice.equals("6")){
@@ -192,7 +192,7 @@ public class Project02Application {
         }
     }
 
-    public static void ManagerMenu(User user,FormService formService,UserService userService) throws InterruptedException {
+    public static void ManagerMenu(User user, FormServiceimpl formServiceimpl, UserServiceimpl userServiceimpl) throws InterruptedException {
         String WindowMana  ="===== 管理员菜单 =====\n" +
                 "1. 查看报修单\n" +
                 "2. 查看单个报修单详情\n" +
@@ -209,7 +209,7 @@ public class Project02Application {
                 System.out.println("查询所有报修单输入a，未处理报修单输入b");
                 String SelectType = sc.nextLine();
                 if(SelectType.equals("a")){
-                    List<Form> forms = formService.SelectAll();
+                    List<Form> forms = formServiceimpl.SelectAll();
                     if(forms.size()>0){
                         System.out.println("报修单详细如下");
                         for(Form form:forms){
@@ -221,7 +221,7 @@ public class Project02Application {
                     Thread.sleep(500);
 
                 }else if(SelectType.equals("b")){
-                    List<Form> forms = formService.SelectByStatus();
+                    List<Form> forms = formServiceimpl.SelectByStatus();
                     System.out.println("报修单详细如下");
                     for(Form form:forms){
                         System.out.println(form);
@@ -234,7 +234,7 @@ public class Project02Application {
             else if(choice.equals("2")){
                 System.out.println("输入查询的报修单id");
                 Integer id = Integer.parseInt(sc.nextLine());
-                Form form = formService.SelectById(id);
+                Form form = formServiceimpl.SelectById(id);
                 System.out.println("查询详情如下");
                 System.out.println(form);
                 Thread.sleep(500);
@@ -250,14 +250,14 @@ public class Project02Application {
                 form.setId(id);
                 form.setStatus(status);
                 form.setUpdate_time(upodate_time);
-                formService.UpdateForm(form);
+                formServiceimpl.UpdateForm(form);
                 System.out.println("更新成功！");
                 Thread.sleep(500);
 
             }else if(choice.equals("4")){
                 System.out.println("请输入要删除的报修单id");
                 Integer id = Integer.parseInt(sc.nextLine());
-                formService.DeleteForm(id);
+                formServiceimpl.DeleteForm(id);
                 System.out.println("删除成功");
                 Thread.sleep(500);
             }else if(choice.equals("5")){
@@ -272,7 +272,7 @@ public class Project02Application {
                     if(password1.equals(password2)){
                         //如果密码一致则可以添加
                         user.setPassword(password1);
-                        userService.UpdateUser(user);
+                        userServiceimpl.UpdateUser(user);
                     }
                 }
             }else if(choice.equals("6")){
