@@ -7,14 +7,38 @@ public class Form {
     String description;
     private Integer status;//0是未维修，1是维修中，2是已完成
     String update_time;
+    String img_url;
 
+
+    public Form() {
+    }
+
+    public Form(Integer id, String userid, String device_type, String description, Integer status, String update_time, String img_url) {
+        this.id = id;
+        this.userid = userid;
+        this.device_type = device_type;
+        this.description = description;
+        this.status = status;
+        this.update_time = update_time;
+        this.img_url = img_url;
+    }
+
+    /**
+     * 获取
+     * @return id
+     */
     public Integer getId() {
         return id;
     }
 
+    /**
+     * 设置
+     * @param id
+     */
     public void setId(Integer id) {
         this.id = id;
     }
+
     /**
      * 获取
      * @return userid
@@ -95,7 +119,23 @@ public class Form {
         this.update_time = update_time;
     }
 
+    /**
+     * 获取
+     * @return img_url
+     */
+    public String getImg_url() {
+        return img_url;
+    }
+
+    /**
+     * 设置
+     * @param img_url
+     */
+    public void setImg_url(String img_url) {
+        this.img_url = img_url;
+    }
+
     public String toString() {
-        return "From{id = " + id + ", userid = " + userid + ", device_type = " + device_type + ", description = " + description + ", status = " + status + ", update_time = " + update_time + "}";
+        return "Form{id = " + id + ", userid = " + userid + ", device_type = " + device_type + ", description = " + description + ", status = " + status + ", update_time = " + update_time + ", img_url = " + img_url + "}";
     }
 }

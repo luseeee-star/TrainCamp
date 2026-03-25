@@ -4,9 +4,11 @@ import lsj.gdut.project02.DTOs.LoginDTO;
 import lsj.gdut.project02.DTOs.RegisterDTO;
 import lsj.gdut.project02.Utils.JwtUtil;
 import lsj.gdut.project02.Utils.ResultJson;
+import lsj.gdut.project02.Utils.ThreadLocalUtil;
 import lsj.gdut.project02.pojo.User;
 import lsj.gdut.project02.service.impl.UserServiceimpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -56,17 +58,49 @@ public class UserController {
             return ResultJson.error("注册失败");
         }
     }
-    //--------------------------学生页面----------------------------
 
-    @GetMapping("/students")
-    public ResultJson<String> students(){
-        return ResultJson.success("登录成功");
+    @GetMapping("/userinfo")
+    public ResultJson<User> userinfo(){
+        Map<String,Object> map = ThreadLocalUtil.get();
+        String userid = map.get("userid").toString();
+        User user = userServiceimpl.SelectUserById(userid);
+        return ResultJson.success(user);
 
+    }
+
+    @PatchMapping("/updatePwd")
+    public ResultJson<String> updatePwd(@RequestBody Map<String,String> map){
+        Map<String,Object> claims = ThreadLocalUtil.get();
+        String userid = claims.get("userid").toString();
+        String oldpassword = map.get("oldpassword");
+        String newpassword = map.get("newpassword");
+        String repassword = map.get("repassword");
+        if(!StringUtils.hasText(oldpassword)||!StringUtils.hasText(newpassword)||!StringUtils.hasText(repassword)){
+            return ResultJson.error("值不能为空");
+        }
+        User user = userServiceimpl.SelectUserById(userid);
+        if(!user.getPassword().equals(oldpassword)){
+            return ResultJson.error("原密码错误");
+        }
+        if (!newpassword.equals(repassword)) {
+            return ResultJson.error("两个密码不一致");
+        }
+        User newuser = new User();
+        newuser.setUserid(userid);
+        newuser.setPassword(newpassword);
+        userServiceimpl.UpdateUser(newuser);
+        return ResultJson.success("修改成功");
     }
     //绑定/修改宿舍
-    @PostMapping("/dorminfos")
-    public ResultJson<String> SetDormInfo(@RequestBody String dorminfo){
-        return ResultJson.success();
+    @PatchMapping("/updateDorm")
+    public ResultJson<String> updateDorm(@RequestBody Map<String,String> map){
+        Map<String,Object> claims = ThreadLocalUtil.get();
+        String userid = claims.get("userid").toString();
+        User user = new User();
+        user.setUserid(userid);
+        String dormInfo = map.get("dormInfo");
+        user.setDorm_info(dormInfo);
+        userServiceimpl.UpdateUser(user);
+        return ResultJson.success("修改成功");
     }
-    //-------------------------管理员页面-----------------------------
 }

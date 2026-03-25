@@ -12,6 +12,9 @@
     <select id="SelectUser" resultType="lsj.gdut.project02.pojo.User">
         select * from sys_user where userid = #{userid} and password = #{password};
     </select>
+    <select id="SelectUserById" resultType="lsj.gdut.project02.pojo.User">
+        select * from sys_user where userid = #{userid}
+    </select>
 
     <update id="UpdateUser">
         update sys_user

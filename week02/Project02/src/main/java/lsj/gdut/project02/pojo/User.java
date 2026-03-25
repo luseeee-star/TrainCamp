@@ -1,10 +1,13 @@
 package lsj.gdut.project02.pojo;
 
+import net.minidev.json.annotate.JsonIgnore;
+
 public class User {
     private Integer id;
     String userid;
+    @JsonIgnore //后续转换成json时忽略密码
     String password;
-    int role;//0是学生，1是维修员
+    Integer role;//0是学生，1是维修员
     String dorm_info;
 
 
@@ -51,7 +54,7 @@ public class User {
      * 获取
      * @return role
      */
-    public int getRole() {
+    public Integer getRole() {
         return role;
     }
 
@@ -59,7 +62,7 @@ public class User {
      * 设置
      * @param role
      */
-    public void setRole(int role) {
+    public void setRole(Integer role) {
         this.role = role;
     }
 

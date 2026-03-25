@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserMapper {
     User SelectUser(@Param("userid")String userid,@Param("password")String password);
+    User SelectUserById(@Param("userid")String userid);
     void InsertUser(User user);
     void UpdateUser(User user);
 }

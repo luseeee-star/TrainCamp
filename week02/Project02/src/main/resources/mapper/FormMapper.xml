@@ -5,8 +5,8 @@
 <!--命名空间-->
 <mapper namespace="lsj.gdut.project02.mapper.FormMapper">
     <insert id="InsertForm" useGeneratedKeys="true" keyProperty="id">
-        insert into repair_form (userid, device_type,description,status,update_time)
-        values (#{userid}, #{device_type}, #{description}, #{status},#{update_time});
+        insert into repair_form (userid, device_type,description,status,update_time,img_url)
+        values (#{userid}, #{device_type}, #{description}, #{status},#{update_time},#{img_url});
     </insert>
 
     <update id="UpdateForm">

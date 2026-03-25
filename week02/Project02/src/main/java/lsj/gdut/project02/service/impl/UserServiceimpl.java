@@ -18,22 +18,20 @@ public class UserServiceimpl implements UserService {
     }
 
     @Override
+    public User SelectUserById(String userid) {
+        return userMapper.SelectUserById(userid);
+    }
+    @Override
     @Transactional //成功则自动提交事务，否则回滚事务
     public void UpdateUser(User user){
         userMapper.UpdateUser(user);
     }
 
 
-    @Transactional
-    public void registerUser(User user){
-
-        user.setDorm_info(null);
-        userMapper.InsertUser(user);
-    }
     @Override
     @Transactional
     public boolean RegisterUser(Integer role,String userid,String password1,String password2){
-        int UserType = role;
+        Integer UserType = role;
         User user = new User();
         boolean isLegal = false;//判断学号or工号是否合法
         //如果用户是学生

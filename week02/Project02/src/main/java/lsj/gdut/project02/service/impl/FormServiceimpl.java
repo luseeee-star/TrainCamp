@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -35,7 +37,18 @@ public class FormServiceimpl implements FormService {
     @Override
     @Transactional
     //新建保修单
-    public void InsertForm(Form form){
+    public void InsertForm(String userid,String device_type,String description,String img_url){
+        //通过时间库来获取当前时间
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
+        String upodate_time = now.format(formatter);
+        Form form = new Form();
+        form.setUserid(userid);
+        form.setDevice_type(device_type);
+        form.setDescription(description);
+        //0是未维修，1是维修中，2是已完成
+        form.setStatus(0);
+        form.setUpdate_time(upodate_time);
         formMapper.InsertForm(form);
     }
 
