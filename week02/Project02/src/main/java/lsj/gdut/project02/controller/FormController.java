@@ -20,6 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/Forms")
+@CrossOrigin // 开启跨域：前端（可能）从不同源访问 /Forms 接口
 public class FormController {
     @Autowired
     private UserServiceimpl userServiceimpl;
@@ -29,13 +30,11 @@ public class FormController {
 
     //创建报修单
     @PostMapping("/insert")
-    public ResultJson<String> insert(@RequestBody Map<String,Object> map,
-                                     @RequestParam(value = "file", required = false)MultipartFile file)throws IOException {
+    public ResultJson<String> insert(@RequestParam("device_type") String device_type,
+                                      @RequestParam("description") String description,
+                                      @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
         Map<String,Object> claims = ThreadLocalUtil.get();
         String userid = claims.get("userid").toString();
-        //获取信息
-        String device_type  = map.get("device_type").toString();
-        String description = map.get("description").toString();
 
         //上传图片
         if(file != null){
@@ -53,7 +52,7 @@ public class FormController {
     }
 
     //查看报修记录
-    @GetMapping("selectForms")
+    @GetMapping("/selectForms")
     public ResultJson<List<Form>> selectForms(){
         Map<String,Object> claims = ThreadLocalUtil.get();
         String userid = claims.get("userid").toString();
@@ -70,16 +69,23 @@ public class FormController {
     }
 
     //查看报修单
-    @GetMapping("selectAllForms")
+    @GetMapping("/selectAllForms")
     public ResultJson<List<Form>> selectAllForms(){
         List<Form> list = formServiceimpl.SelectAll();
         return ResultJson.success(list);
     }
     //查看单个报修单详细
-    @GetMapping("selectFormsByStatus")
+    @GetMapping("/selectFormsByStatus")
     public ResultJson<List<Form>> selectFormsByStatus(){
         List<Form> list = formServiceimpl.SelectByStatus();
         return ResultJson.success(list);
+    }
+
+    // 查看报修单详细（按 id）
+    @GetMapping("/selectById")
+    public ResultJson<Form> selectById(@RequestParam("id") Integer id){
+        Form form = formServiceimpl.SelectById(id);
+        return ResultJson.success(form);
     }
     //更新报修单状态
     @PatchMapping("/updateStatus")

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -16,6 +17,17 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor).excludePathPatterns("/Users/login","/Users/registers","/msg/**");
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        // 允许前端跨域访问（尤其是携带 Authorization header 时会触发 OPTIONS 预检）
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(false)
+                .maxAge(3600);
     }
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

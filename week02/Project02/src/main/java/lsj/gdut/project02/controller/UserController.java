@@ -16,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/Users")
+@CrossOrigin //开启跨域
 public class UserController {
     /*
     用户界面一共有登录注册两个功能，那么就设计两个函数
@@ -51,12 +52,7 @@ public class UserController {
         String userid = registerdto.getUserid();
         String password1 = registerdto.getPassword1();
         String password2 = registerdto.getPassword2();
-        boolean Ifsuccess =  userServiceimpl.RegisterUser(role,userid,password1,password2);
-        if(Ifsuccess){
-            return ResultJson.success();
-        }else{
-            return ResultJson.error("注册失败");
-        }
+        return userServiceimpl.RegisterUser(role,userid,password1,password2);
     }
 
     @GetMapping("/userinfo")

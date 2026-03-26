@@ -1,5 +1,6 @@
 package lsj.gdut.project02.service.impl;
 
+import lsj.gdut.project02.Utils.ResultJson;
 import lsj.gdut.project02.mapper.UserMapper;
 import lsj.gdut.project02.pojo.User;
 import lsj.gdut.project02.service.UserService;
@@ -30,17 +31,19 @@ public class UserServiceimpl implements UserService {
 
     @Override
     @Transactional
-    public boolean RegisterUser(Integer role,String userid,String password1,String password2){
+    public ResultJson<String> RegisterUser(Integer role, String userid, String password1, String password2){
         Integer UserType = role;
         User user = new User();
+        User user1 = userMapper.SelectUserById(userid);
+        if(user1 != null){
+            return ResultJson.error("用户已存在");
+        }
         boolean isLegal = false;//判断学号or工号是否合法
         //如果用户是学生
         if (UserType == 0) {
-            System.out.println("请输入10位学号（前缀3125或3225）：");
             isLegal = userid.matches("3[1-2]25\\d{6}");
         }//如果是维修人员
         else if (UserType == 1) {
-            System.out.println("请输入10位工号（前缀0025）：");
             isLegal = userid.matches("0025\\d{6}");
         }
         if(isLegal){
@@ -51,14 +54,12 @@ public class UserServiceimpl implements UserService {
                 user.setRole(UserType);
                 user.setDorm_info(null);
                 userMapper.InsertUser(user);
-                return true;
+                return ResultJson.success("注册成功");
             }else {
-                System.out.println("密码不一致！");
-                return false;
+                return ResultJson.error("密码不一致");
             }
         }else{
-            System.out.println("学号不合法");
-            return false;
+            return ResultJson.error("学号不合法");
         }
     }
 
