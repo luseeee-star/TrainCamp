@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>管理员菜单 - 宿舍报修管理系统</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        .page {
+            max-width: 1000px;
+            margin: 28px auto;
+            padding: 16px;
+        }
+        .topbar {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .topbar h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #4a90e2;
+        }
+        .meta {
+            font-size: 13px;
+            color: #333;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        button {
+            padding: 10px 14px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background-color: #357abd; }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #b02a37; }
+        .grid {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+        .panel {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 16px;
+        }
+        .menu-title {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+            font-weight: 700;
+        }
+        .menu-box {
+            background: #f8fbff;
+            border: 1px solid #e8f1ff;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        .menu-action {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background: white;
+        }
+        .field { margin-bottom: 12px; }
+        .label { display: block; font-size: 13px; margin-bottom: 6px; color: #444; }
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .error {
+            margin-top: 10px;
+            color: #dc3545;
+            font-size: 13px;
+        }
+        .success {
+            margin-top: 10px;
+            color: #198754;
+            font-size: 13px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+        th, td {
+            border: 1px solid #eee;
+            padding: 10px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th { background: #fafafa; }
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: #f1f3f5;
+        }
+        .tag-0 { background: #fff3cd; }
+        .tag-1 { background: #cce5ff; }
+        .tag-2 { background: #d4edda; }
+        .split-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fafafa;
+        }
+        .card h3 { margin: 0 0 10px 0; font-size: 15px; }
+        .img {
+            max-width: 240px;
+            max-height: 160px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+            margin-top: 10px;
+            display: block;
+        }
+        .kv {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 8px 12px;
+            font-size: 13px;
+            align-items: center;
+        }
+        .kv .k { color: #666; }
+        .kv .v { word-break: break-word; }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="page">
+        <div class="topbar">
+            <h1>管理员菜单 - 宿舍报修管理系统</h1>
+            <div class="meta">
+                <span v-if="user">账号：{{ user.userid }}</span>
+                <span v-if="user">身份：维修人员</span>
+                <button class="btn-secondary" @click="logout">退出</button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="panel">
+                <div class="menu-title">菜单</div>
+                <div class="menu-box">
+===== 管理员菜单 =====
+                </div>
+                <div class="menu-action" style="flex-direction: column; align-items: stretch;">
+                    <button :disabled="loading" @click="chooseOption(1)">1. 查看所有报修单</button>
+                    <button :disabled="loading" @click="chooseOption(2)">2. 查看报修单详情</button>
+                    <button :disabled="loading" @click="chooseOption(3)">3. 更新报修单状态</button>
+                    <button :disabled="loading" @click="chooseOption(4)">4. 删除报修单</button>
+                    <button :disabled="loading" @click="chooseOption(5)">5. 修改密码</button>
+                    <button class="btn-secondary" :disabled="loading" @click="logout">6. 退出</button>
+                </div>
+                <div class="error" v-if="errorMsg">{{ errorMsg }}</div>
+                <div class="success" v-if="successMsg">{{ successMsg }}</div>
+            </div>
+
+            <div class="panel">
+                <!-- 1. 查看所有报修单 -->
+                <div v-if="activeOption===1">
+                    <h2 style="margin:0 0 12px 0;">所有报修单</h2>
+                    <div class="split-buttons">
+                        <button :disabled="loading" @click="chooseListMode('all')">查看所有报修单</button>
+                        <button :disabled="loading" @click="chooseListMode('pending')">查看未维修状态(0)</button>
+                        <button class="btn-secondary" :disabled="loading" @click="refreshListForMode">刷新列表</button>
+                    </div>
+                    <div class="hint" style="margin-top: 8px;" v-if="listMode==='pending'">
+                        这里显示 `status=未维修(0)` 的报修单。
+                    </div>
+                    <table v-if="listMode==='all' && allForms && allForms.length">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>账号</th>
+                            <th>设备类型</th>
+                            <th>描述</th>
+                            <th>状态</th>
+                            <th>更新时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="f in allForms" :key="f.id">
+                            <td>{{ f.id }}</td>
+                            <td>{{ f.userid }}</td>
+                            <td>{{ f.device_type }}</td>
+                            <td style="max-width:280px;word-break:break-all;">{{ f.description }}</td>
+                            <td>
+                                <span class="tag" :class="statusTagClass(f.status)">{{ statusText(f.status) }}</span>
+                            </td>
+                            <td>{{ f.update_time }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <table v-else-if="listMode==='pending' && pendingForms && pendingForms.length">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>账号</th>
+                            <th>设备类型</th>
+                            <th>描述</th>
+                            <th>状态</th>
+                            <th>更新时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="f in pendingForms" :key="f.id">
+                            <td>{{ f.id }}</td>
+                            <td>{{ f.userid }}</td>
+                            <td>{{ f.device_type }}</td>
+                            <td style="max-width:280px;word-break:break-all;">{{ f.description }}</td>
+                            <td>
+                                <span class="tag" :class="statusTagClass(f.status)">{{ statusText(f.status) }}</span>
+                            </td>
+                            <td>{{ f.update_time }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div
+                        v-else
+                        class="hint"
+                    >
+                        {{ listMode==='pending' ? '暂无未维修状态(0)的报修单。' : '暂无报修单。' }}
+                    </div>
+                </div>
+
+                <!-- 2. 查看报修单详情（按 id 查询） -->
+                <div v-else-if="activeOption===2">
+                    <h2 style="margin:0 0 12px 0;">报修单详情</h2>
+                    <div class="row">
+                        <div class="field">
+                            <label class="label">请输入报修单编号 id</label>
+                            <input type="text" v-model="detailId" placeholder="例如：1" />
+                        </div>
+                    </div>
+                    <div class="split-buttons">
+                        <button :disabled="loading" @click="showDetail">查看详情</button>
+                    </div>
+                    <div v-if="detailForm" class="card" style="margin-top: 12px;">
+                        <h3>详情</h3>
+                        <div class="kv">
+                            <div class="k">id</div><div class="v">{{ detailForm.id }}</div>
+                            <div class="k">账号</div><div class="v">{{ detailForm.userid }}</div>
+                            <div class="k">设备类型</div><div class="v">{{ detailForm.device_type }}</div>
+                            <div class="k">描述</div><div class="v">{{ detailForm.description }}</div>
+                            <div class="k">状态</div><div class="v">{{ statusText(detailForm.status) }}</div>
+                            <div class="k">更新时间</div><div class="v">{{ detailForm.update_time }}</div>
+                        </div>
+                    <div v-if="detailForm && formatImgUrl(detailForm.img_url || detailForm.imgUrl)" style="margin-top: 10px;">
+                            <div class="hint" style="margin-top: 0;">
+                                图片地址(img_url)：{{ detailForm.img_url }}；图片地址(imgUrl)：{{ detailForm.imgUrl }}
+                            </div>
+                        <div class="hint" style="margin-top: 6px;">
+                            最终src：{{ formatImgUrl(detailForm.img_url || detailForm.imgUrl) }}
+                        </div>
+                            <img
+                                class="img"
+                                :src="formatImgUrl(detailForm.img_url || detailForm.imgUrl)"
+                                alt="报修图片"
+                            />
+                        </div>
+                    </div>
+                    <div v-else class="hint" style="margin-top: 12px;">请输入 id 后查看。</div>
+                </div>
+
+                <!-- 3. 更新报修单状态 -->
+                <div v-else-if="activeOption===3">
+                    <h2 style="margin:0 0 12px 0;">更新报修单状态</h2>
+                    <div class="split-buttons">
+                        <button :disabled="loading" @click="loadAllForms">刷新列表</button>
+                    </div>
+                    <table v-if="allForms && allForms.length">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>设备类型</th>
+                            <th>当前状态</th>
+                            <th>更新为</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="f in allForms" :key="f.id">
+                            <td>{{ f.id }}</td>
+                            <td>{{ f.device_type }}</td>
+                            <td>
+                                <span class="tag" :class="statusTagClass(f.status)">{{ statusText(f.status) }}</span>
+                            </td>
+                            <td style="min-width: 140px;">
+                                <select v-model.number="updateStatusMap[f.id]">
+                                    <option :value="1">维修中</option>
+                                    <option :value="2">已完成</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button :disabled="loading" @click="handleUpdateStatus(f.id)">更新</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div v-else class="hint">暂无报修单。</div>
+                </div>
+
+                <!-- 4. 删除报修单 -->
+                <div v-else-if="activeOption===4">
+                    <h2 style="margin:0 0 12px 0;">删除报修单</h2>
+                    <div class="split-buttons">
+                        <button :disabled="loading" @click="loadAllForms">刷新列表</button>
+                    </div>
+                    <table v-if="allForms && allForms.length">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>账号</th>
+                            <th>设备类型</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="f in allForms" :key="f.id">
+                            <td>{{ f.id }}</td>
+                            <td>{{ f.userid }}</td>
+                            <td>{{ f.device_type }}</td>
+                            <td>
+                                <span class="tag" :class="statusTagClass(f.status)">{{ statusText(f.status) }}</span>
+                            </td>
+                            <td>
+                                <button class="btn-danger" :disabled="loading" @click="handleDeleteForm(f.id)">删除</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div v-else class="hint">暂无可删除的报修单。</div>
+                </div>
+
+                <!-- 5. 修改密码 -->
+                <div v-else-if="activeOption===5">
+                    <h2 style="margin:0 0 12px 0;">修改密码</h2>
+                    <div class="field">
+                        <label class="label">原密码</label>
+                        <input type="password" v-model="oldPassword" placeholder="请输入原密码" />
+                    </div>
+                    <div class="field">
+                        <label class="label">新密码</label>
+                        <input type="password" v-model="newPassword" placeholder="请输入新密码" />
+                    </div>
+                    <div class="field">
+                        <label class="label">确认新密码</label>
+                        <input type="password" v-model="rePassword" placeholder="请再次输入新密码" />
+                    </div>
+                    <button :disabled="loading" @click="handleUpdatePwd">
+                        {{ loading ? '提交中...' : '保存修改' }}
+                    </button>
+                </div>
+
+                <!-- 默认 -->
+                <div v-else>
+                    <h2 style="margin:0 0 12px 0;">欢迎</h2>
+                    <div class="hint">点击左侧按钮选择功能。页面会自动读取当前用户的 token。</div>
+                    <div class="split-buttons">
+                        <button @click="chooseOption(1)">查看所有报修单</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            const BASE_URL = 'http://localhost:8080';
+            const user = ref(null);
+            const activeOption = ref(0);
+            const allForms = ref([]);
+                    const pendingForms = ref([]);
+                    const listMode = ref('all'); // 'all' or 'pending'
+
+            const detailId = ref('');
+            const detailForm = ref(null);
+
+            const updateStatusMap = ref({});
+
+            const oldPassword = ref('');
+            const newPassword = ref('');
+            const rePassword = ref('');
+
+            const errorMsg = ref('');
+            const successMsg = ref('');
+            const loading = ref(false);
+
+            function statusText(status) {
+                const n = Number(status);
+                if (n === 0) return '未维修';
+                if (n === 1) return '维修中';
+                if (n === 2) return '已完成';
+                return '未知';
+            }
+
+            function statusTagClass(status) {
+                const n = Number(status);
+                if (n === 0) return 'tag-0';
+                if (n === 1) return 'tag-1';
+                if (n === 2) return 'tag-2';
+                return '';
+            }
+
+            function formatImgUrl(imgUrl) {
+                if (!imgUrl) return '';
+                const s = String(imgUrl).trim();
+                if (s === '') return '';
+                if (s.toLowerCase() === 'null') return '';
+                if (s.startsWith('http://') || s.startsWith('https://')) return s;
+                if (s.startsWith('//')) return 'http:' + s;
+                // 后端可能返回类似 "localhost:8080/msg/xxx.jpg"（无协议）
+                if (s.startsWith('localhost:') || s.startsWith('127.0.0.1:')) return 'http://' + s;
+                if (s.startsWith('localhost')) return 'http://' + s;
+                // 可能返回 "/msg/xxx.jpg"
+                if (s.startsWith('/')) return BASE_URL + s;
+                // 兜底：拼接为 http://localhost:8080/<imgUrl>
+                return BASE_URL + '/' + s;
+            }
+
+            async function apiCall(url, method, data) {
+                const token = localStorage.getItem('token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = token;
+
+                const options = { method, headers };
+                if (data !== undefined) options.body = JSON.stringify(data);
+
+                const resp = await fetch(BASE_URL + url, options);
+                if (resp.status === 401) {
+                    localStorage.removeItem('token');
+                    alert('登录已过期，请重新登录');
+                    window.location.href = 'login.html';
+                    throw new Error('Unauthorized');
+                }
+                if (!resp.ok) {
+                    throw new Error(`HTTP Error: ${resp.status}`);
+                }
+                return await resp.json();
+            }
+
+            async function loadUser() {
+                errorMsg.value = '';
+                successMsg.value = '';
+                user.value = null;
+
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const result = await apiCall('/Users/userinfo', 'GET');
+                if (result.code !== 200) {
+                    throw new Error(result.msg || '获取用户信息失败');
+                }
+                user.value = result.data;
+
+                if (user.value.role !== 1) {
+                    window.location.href = 'student_dashboard.html';
+                    return;
+                }
+            }
+
+            async function loadAllForms() {
+                errorMsg.value = '';
+                loading.value = true;
+                try {
+                    const result = await apiCall('/Forms/selectAllForms', 'GET');
+                    if (result.code !== 200) {
+                        throw new Error(result.msg || '获取报修单失败');
+                    }
+                    allForms.value = result.data || [];
+                    // 初始化每行更新目标状态（默认用当前状态；但下拉只允许 1/2）
+                    const map = {};
+                    (allForms.value || []).forEach(f => {
+                        const curr = Number(f.status);
+                        map[f.id] = (curr === 2 || curr === 1) ? curr : 1;
+                    });
+                    updateStatusMap.value = map;
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function loadPendingForms() {
+                errorMsg.value = '';
+                loading.value = true;
+                try {
+                    const result = await apiCall('/Forms/selectFormsByStatus', 'GET');
+                    if (result.code !== 200) {
+                        throw new Error(result.msg || '获取待处理报修单失败');
+                    }
+                    pendingForms.value = result.data || [];
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function showDetail() {
+                errorMsg.value = '';
+                successMsg.value = '';
+                const id = Number(detailId.value);
+                if (!Number.isInteger(id)) {
+                    errorMsg.value = '请输入正确的 id';
+                    return;
+                }
+                loading.value = true;
+                detailForm.value = null;
+                try {
+                    const result = await apiCall('/Forms/selectById?id=' + encodeURIComponent(id), 'GET');
+                    if (result.code === 200) {
+                        detailForm.value = result.data || null;
+                        if (!detailForm.value) {
+                            errorMsg.value = '未找到该报修单';
+                        }
+                    } else {
+                        errorMsg.value = result.msg || '查询失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function handleUpdateStatus(id) {
+                if (!id) return;
+                const next = Number(updateStatusMap.value[id]);
+                if (next !== 1 && next !== 2) {
+                    errorMsg.value = '状态只能更新为 1(维修中) 或 2(已完成)';
+                    return;
+                }
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+                try {
+                    const result = await apiCall('/Forms/updateStatus', 'PATCH', { id: id, status: next });
+                    if (result.code === 200) {
+                        successMsg.value = '更新成功';
+                        await loadAllForms();
+                        if (detailForm.value && Number(detailForm.value.id) === Number(id)) {
+                            showDetail();
+                        }
+                    } else {
+                        errorMsg.value = result.msg || '更新失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function handleDeleteForm(id) {
+                if (!id) return;
+                if (!confirm('确定要删除该报修单吗？')) return;
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+                try {
+                    const result = await apiCall('/Forms/deleteForm', 'DELETE', { id: id });
+                    if (result.code === 200) {
+                        successMsg.value = '删除成功';
+                        await loadAllForms();
+                        if (detailForm.value && Number(detailForm.value.id) === Number(id)) {
+                            detailForm.value = null;
+                        }
+                    } else {
+                        errorMsg.value = result.msg || '删除失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function handleUpdatePwd() {
+                if (!oldPassword.value.trim() || !newPassword.value.trim() || !rePassword.value.trim()) {
+                    errorMsg.value = '值不能为空';
+                    return;
+                }
+                if (newPassword.value.trim() !== rePassword.value.trim()) {
+                    errorMsg.value = '两个密码不一致';
+                    return;
+                }
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+                try {
+                    const result = await apiCall('/Users/updatePwd', 'PATCH', {
+                        oldpassword: oldPassword.value.trim(),
+                        newpassword: newPassword.value.trim(),
+                        repassword: rePassword.value.trim()
+                    });
+                    if (result.code === 200) {
+                        successMsg.value = result.data || '修改成功';
+                        oldPassword.value = '';
+                        newPassword.value = '';
+                        rePassword.value = '';
+                    } else {
+                        errorMsg.value = result.msg || '修改失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function chooseOption(n) {
+                errorMsg.value = '';
+                successMsg.value = '';
+                detailForm.value = null;
+                if (n === 1) {
+                    activeOption.value = n;
+                    if (listMode.value === 'pending') {
+                        await loadPendingForms();
+                    } else {
+                        await loadAllForms();
+                    }
+                    return;
+                }
+                if (n === 3 || n === 4) {
+                    activeOption.value = n;
+                    await loadAllForms();
+                    return;
+                }
+                if (n === 2) {
+                    activeOption.value = n;
+                    return;
+                }
+                if (n === 5) {
+                    activeOption.value = n;
+                    return;
+                }
+                activeOption.value = n;
+            }
+
+            async function chooseListMode(mode) {
+                errorMsg.value = '';
+                successMsg.value = '';
+                listMode.value = mode;
+                if (mode === 'pending') {
+                    await loadPendingForms();
+                } else {
+                    await loadAllForms();
+                }
+            }
+
+            async function refreshListForMode() {
+                if (listMode.value === 'pending') {
+                    await loadPendingForms();
+                } else {
+                    await loadAllForms();
+                }
+            }
+
+            function logout() {
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+
+            onMounted(async () => {
+                try {
+                    await loadUser();
+                    activeOption.value = 1;
+                    await loadAllForms();
+                } catch (e) {
+                    errorMsg.value = e?.message || '加载失败';
+                }
+            });
+
+            return {
+                user,
+                activeOption,
+                allForms,
+                pendingForms,
+                detailId,
+                detailForm,
+                updateStatusMap,
+                oldPassword,
+                newPassword,
+                rePassword,
+                errorMsg,
+                successMsg,
+                loading,
+                statusText,
+                statusTagClass,
+                formatImgUrl,
+                chooseOption,
+                listMode,
+                chooseListMode,
+                refreshListForMode,
+                showDetail,
+                loadAllForms,
+                loadPendingForms,
+                handleUpdateStatus,
+                handleDeleteForm,
+                handleUpdatePwd,
+                logout
+            };
+        }
+    }).mount('#app');
+    // mount 到 #app 保证不会覆盖页面结构
+</script>
+</body>
+</html>
+

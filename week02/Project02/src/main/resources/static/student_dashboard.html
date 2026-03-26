@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>学生菜单 - 宿舍报修管理系统</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+        .page {
+            max-width: 1000px;
+            margin: 28px auto;
+            padding: 16px;
+        }
+        .topbar {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .topbar h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #4a90e2;
+        }
+        .meta {
+            font-size: 13px;
+            color: #333;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        button {
+            padding: 10px 14px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover { background-color: #357abd; }
+        .btn-secondary { background-color: #6c757d; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-danger:hover { background-color: #b02a37; }
+        .grid {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+        .panel {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 16px;
+        }
+        .menu-title {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+            font-weight: 700;
+        }
+        .menu-box {
+            background: #f8fbff;
+            border: 1px solid #e8f1ff;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        .menu-action {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .field { margin-bottom: 12px; }
+        .label { display: block; font-size: 13px; margin-bottom: 6px; color: #444; }
+        .row { display: flex; gap: 10px; }
+        .row > div { flex: 1; }
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .error {
+            margin-top: 10px;
+            color: #dc3545;
+            font-size: 13px;
+        }
+        .success {
+            margin-top: 10px;
+            color: #198754;
+            font-size: 13px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+        th, td {
+            border: 1px solid #eee;
+            padding: 10px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th { background: #fafafa; }
+        .tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            background: #f1f3f5;
+        }
+        .tag-0 { background: #fff3cd; }
+        .tag-1 { background: #cce5ff; }
+        .tag-2 { background: #d4edda; }
+        .img {
+            max-width: 160px;
+            max-height: 100px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+        .split-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="page">
+        <div class="topbar">
+            <h1>学生菜单 - 宿舍报修管理系统</h1>
+            <div class="meta">
+                <span v-if="user">账号：{{ user.userid }}</span>
+                <span v-if="user">身份：学生</span>
+                <button class="btn-secondary" @click="logout">退出</button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="panel">
+            <div class="menu-title">菜单</div>
+            <div class="menu-box">
+===== 学生菜单 =====
+            </div>
+            <div class="menu-action" style="flex-direction: column; align-items: stretch;">
+                <button :disabled="loading" @click="chooseOption(1)">1. 绑定/修改宿舍</button>
+                <button :disabled="loading" @click="chooseOption(2)">2. 创建报修单</button>
+                <button :disabled="loading" @click="chooseOption(3)">3. 查看我的报修记录</button>
+                <button :disabled="loading" @click="chooseOption(4)">4. 取消报修单</button>
+                <button :disabled="loading" @click="chooseOption(5)">5. 修改密码</button>
+                <button class="btn-secondary" :disabled="loading" @click="logout">6. 退出</button>
+            </div>
+            <div class="hint" v-if="user && (!user.dorm_info || user.dorm_info.trim()==='') && activeOption!==1">
+                检测到未绑定宿舍，请先点击 `1`。
+            </div>
+            <div class="error" v-if="errorMsg">{{ errorMsg }}</div>
+            <div class="success" v-if="successMsg">{{ successMsg }}</div>
+        </div>
+
+        <div class="panel">
+            <!-- 1. 宿舍绑定 -->
+            <div v-if="activeOption===1">
+                <h2 style="margin:0 0 12px 0;">绑定/修改宿舍</h2>
+                <div class="field">
+                    <label class="label">宿舍信息</label>
+                    <input type="text" v-model="dormInfo" placeholder="例如：A-301 / 3号楼-301 等" />
+                </div>
+                <button :disabled="loading" @click="handleUpdateDorm">
+                    {{ loading ? '提交中...' : '提交修改' }}
+                </button>
+            </div>
+
+            <!-- 2. 创建报修 -->
+            <div v-else-if="activeOption===2">
+                <h2 style="margin:0 0 12px 0;">创建报修单</h2>
+                <div class="row">
+                    <div class="field">
+                        <label class="label">设备类型</label>
+                        <input type="text" v-model="deviceType" placeholder="例如：空调/水龙头/灯具" />
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">故障描述</label>
+                    <input type="text" v-model="description" placeholder="请描述具体问题..." />
+                </div>
+                <div class="field">
+                    <label class="label">是否上传图片（可选）</label>
+                    <div class="row" style="align-items: center;">
+                        <div style="flex: 0 0 220px;">
+                            <input type="checkbox" id="uploadImage" v-model="uploadImage" />
+                            <label for="uploadImage" style="margin-left: 8px;">上传图片</label>
+                        </div>
+                        <div v-if="uploadImage" style="flex: 1;">
+                            <input type="file" accept="image/*" @change="onFileChange" />
+                            <div class="hint" v-if="selectedFileName">{{ selectedFileName }}</div>
+                        </div>
+                        <div v-else class="hint" style="margin-top: 0; flex: 1;">
+                            不上传也可以创建报修单。
+                        </div>
+                    </div>
+                </div>
+                <div class="split-buttons">
+                    <button :disabled="loading" @click="handleInsertForm">
+                        {{ loading ? '提交中...' : '提交报修' }}
+                    </button>
+                    <button class="btn-secondary" :disabled="loading" @click="resetCreateForm">清空</button>
+                </div>
+            </div>
+
+            <!-- 3. 查看报修记录 -->
+            <div v-else-if="activeOption===3">
+                <h2 style="margin:0 0 12px 0;">我的报修记录</h2>
+                <div class="split-buttons">
+                    <button :disabled="loading" @click="loadMyForms">刷新列表</button>
+                </div>
+                <table v-if="myForms && myForms.length">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>设备类型</th>
+                        <th>描述</th>
+                        <th>状态</th>
+                        <th>更新时间</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="f in myForms" :key="f.id">
+                        <td>{{ f.id }}</td>
+                        <td>{{ f.device_type }}</td>
+                        <td style="max-width:260px;word-break:break-all;">{{ f.description }}</td>
+                        <td>
+                            <span class="tag" :class="statusTagClass(f.status)">{{ statusText(f.status) }}</span>
+                        </td>
+                        <td>{{ f.update_time }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div v-else class="hint">暂无报修记录。</div>
+            </div>
+
+            <!-- 4. 取消报修单 -->
+            <div v-else-if="activeOption===4">
+                <h2 style="margin:0 0 12px 0;">取消报修单</h2>
+                <div class="split-buttons">
+                    <button :disabled="loading" @click="loadMyForms">刷新列表</button>
+                </div>
+                <table v-if="myForms && myForms.length">
+                    <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>设备类型</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="f in myForms" :key="f.id">
+                        <td>{{ f.id }}</td>
+                        <td>{{ f.device_type }}</td>
+                        <td>
+                            <span class="tag" :class="statusTagClass(f.status)">{{ statusText(f.status) }}</span>
+                        </td>
+                        <td>
+                            <button class="btn-danger" :disabled="loading" @click="handleCancelForm(f.id)">取消</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div v-else class="hint">暂无可取消的报修单。</div>
+            </div>
+
+            <!-- 5. 修改密码 -->
+            <div v-else-if="activeOption===5">
+                <h2 style="margin:0 0 12px 0;">修改密码</h2>
+                <div class="field">
+                    <label class="label">原密码</label>
+                    <input type="password" v-model="oldPassword" placeholder="请输入原密码" />
+                </div>
+                <div class="field">
+                    <label class="label">新密码</label>
+                    <input type="password" v-model="newPassword" placeholder="请输入新密码" />
+                </div>
+                <div class="field">
+                    <label class="label">确认新密码</label>
+                    <input type="password" v-model="rePassword" placeholder="请再次输入新密码" />
+                </div>
+                <button :disabled="loading" @click="handleUpdatePwd">
+                    {{ loading ? '提交中...' : '保存修改' }}
+                </button>
+            </div>
+
+            <!-- 默认 -->
+            <div v-else>
+                <h2 style="margin:0 0 12px 0;">欢迎</h2>
+                <div class="hint">
+                    点击左侧按钮选择功能。如果你是首次登录，系统可能会提示先绑定宿舍。
+                </div>
+                <div class="split-buttons">
+                    <button v-if="user && (!user.dorm_info || user.dorm_info.trim()==='')" @click="chooseOption(1)">去绑定宿舍</button>
+                    <button v-else @click="chooseOption(3)">查看我的报修记录</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            const BASE_URL = 'http://localhost:8080';
+            const user = ref(null);
+            const activeOption = ref(0);
+            const myForms = ref([]);
+
+            const dormInfo = ref('');
+            const deviceType = ref('');
+            const description = ref('');
+            const uploadImage = ref(false);
+            const selectedFile = ref(null);
+            const selectedFileName = ref('');
+
+            const oldPassword = ref('');
+            const newPassword = ref('');
+            const rePassword = ref('');
+
+            const errorMsg = ref('');
+            const successMsg = ref('');
+            const loading = ref(false);
+
+            function statusText(status) {
+                const n = Number(status);
+                if (n === 0) return '未维修';
+                if (n === 1) return '维修中';
+                if (n === 2) return '已完成';
+                return '未知';
+            }
+
+            function statusTagClass(status) {
+                const n = Number(status);
+                if (n === 0) return 'tag-0';
+                if (n === 1) return 'tag-1';
+                if (n === 2) return 'tag-2';
+                return '';
+            }
+
+            async function apiCall(url, method, data) {
+                const token = localStorage.getItem('token');
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = token;
+
+                const options = { method, headers };
+                if (data !== undefined) options.body = JSON.stringify(data);
+
+                const resp = await fetch(BASE_URL + url, options);
+                if (resp.status === 401) {
+                    localStorage.removeItem('token');
+                    alert('登录已过期，请重新登录');
+                    window.location.href = 'login.html';
+                    throw new Error('Unauthorized');
+                }
+                if (!resp.ok) {
+                    throw new Error(`HTTP Error: ${resp.status}`);
+                }
+                return await resp.json();
+            }
+
+            async function apiCallFormData(url, method, formData) {
+                const token = localStorage.getItem('token');
+                const headers = {};
+                if (token) headers['Authorization'] = token;
+
+                const resp = await fetch(BASE_URL + url, {
+                    method: method,
+                    headers: headers,
+                    body: formData
+                });
+                if (resp.status === 401) {
+                    localStorage.removeItem('token');
+                    alert('登录已过期，请重新登录');
+                    window.location.href = 'login.html';
+                    throw new Error('Unauthorized');
+                }
+                if (!resp.ok) {
+                    throw new Error(`HTTP Error: ${resp.status}`);
+                }
+                return await resp.json();
+            }
+
+            async function loadUser() {
+                errorMsg.value = '';
+                successMsg.value = '';
+                user.value = null;
+
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const result = await apiCall('/Users/userinfo', 'GET');
+                if (result.code !== 200) {
+                    throw new Error(result.msg || '获取用户信息失败');
+                }
+                user.value = result.data;
+
+                if (user.value.role !== 0) {
+                    window.location.href = 'admin_dashboard.html';
+                    return;
+                }
+
+                dormInfo.value = user.value.dorm_info || '';
+                const hasDorm = user.value.dorm_info && user.value.dorm_info.trim() !== '';
+                activeOption.value = hasDorm ? 3 : 1;
+            }
+
+            async function loadMyForms() {
+                errorMsg.value = '';
+                myForms.value = [];
+                loading.value = true;
+                try {
+                    const result = await apiCall('/Forms/selectForms', 'GET');
+                    if (result.code !== 200) {
+                        throw new Error(result.msg || '获取报修记录失败');
+                    }
+                    myForms.value = result.data || [];
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function chooseOption(n) {
+                errorMsg.value = '';
+                successMsg.value = '';
+                if (n === 1 || n === 2 || n === 5) {
+                    activeOption.value = n;
+                    return;
+                }
+                if (n === 3 || n === 4) {
+                    activeOption.value = n;
+                    await loadMyForms();
+                    return;
+                }
+                activeOption.value = n;
+            }
+
+            async function handleUpdateDorm() {
+                if (!dormInfo.value || dormInfo.value.trim() === '') {
+                    errorMsg.value = '宿舍信息不能为空';
+                    return;
+                }
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+                try {
+                    const result = await apiCall('/Users/updateDorm', 'PATCH', { dormInfo: dormInfo.value.trim() });
+                    if (result.code === 200) {
+                        successMsg.value = '修改成功';
+                        await loadUser();
+                        await loadMyForms().catch(() => {});
+                    } else {
+                        errorMsg.value = result.msg || '修改失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function handleInsertForm() {
+                if (!deviceType.value.trim()) {
+                    errorMsg.value = '设备类型不能为空';
+                    return;
+                }
+                if (!description.value.trim()) {
+                    errorMsg.value = '故障描述不能为空';
+                    return;
+                }
+                if (uploadImage.value && !selectedFile.value) {
+                    errorMsg.value = '已选择上传图片，但未选择文件';
+                    return;
+                }
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+                try {
+                    const fd = new FormData();
+                    fd.append('device_type', deviceType.value.trim());
+                    fd.append('description', description.value.trim());
+                    if (uploadImage.value && selectedFile.value) {
+                        fd.append('file', selectedFile.value);
+                    }
+
+                    const result = await apiCallFormData('/Forms/insert', 'POST', fd);
+                    if (result.code === 200) {
+                        successMsg.value = '报修提交成功';
+                        deviceType.value = '';
+                        description.value = '';
+                        uploadImage.value = false;
+                        selectedFile.value = null;
+                        selectedFileName.value = '';
+                        await loadMyForms();
+                        activeOption.value = 3;
+                    } else {
+                        errorMsg.value = result.msg || '提交失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            function resetCreateForm() {
+                deviceType.value = '';
+                description.value = '';
+                uploadImage.value = false;
+                selectedFile.value = null;
+                selectedFileName.value = '';
+                errorMsg.value = '';
+                successMsg.value = '';
+            }
+
+            function onFileChange(e) {
+                const file = e && e.target && e.target.files ? e.target.files[0] : null;
+                selectedFile.value = file || null;
+                selectedFileName.value = selectedFile.value ? selectedFile.value.name : '';
+                // 如果用户选择了文件，就自动勾选“上传图片”，避免遗漏导致后端存储 img_url 为 null
+                uploadImage.value = !!selectedFile.value;
+            }
+
+            async function handleCancelForm(id) {
+                if (!id) return;
+                if (!confirm('确定要取消该报修单吗？')) return;
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+                try {
+                    const result = await apiCall('/Forms/deleteForm', 'DELETE', { id: id });
+                    if (result.code === 200) {
+                        successMsg.value = '取消成功';
+                        await loadMyForms();
+                    } else {
+                        errorMsg.value = result.msg || '取消失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            async function handleUpdatePwd() {
+                if (!oldPassword.value.trim() || !newPassword.value.trim() || !rePassword.value.trim()) {
+                    errorMsg.value = '值不能为空';
+                    return;
+                }
+                if (newPassword.value.trim() !== rePassword.value.trim()) {
+                    errorMsg.value = '两个密码不一致';
+                    return;
+                }
+                loading.value = true;
+                errorMsg.value = '';
+                successMsg.value = '';
+                try {
+                    const result = await apiCall('/Users/updatePwd', 'PATCH', {
+                        oldpassword: oldPassword.value.trim(),
+                        newpassword: newPassword.value.trim(),
+                        repassword: rePassword.value.trim()
+                    });
+                    if (result.code === 200) {
+                        successMsg.value = result.data || '修改成功';
+                        oldPassword.value = '';
+                        newPassword.value = '';
+                        rePassword.value = '';
+                    } else {
+                        errorMsg.value = result.msg || '修改失败';
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '网络错误、服务器未启动';
+                } finally {
+                    loading.value = false;
+                }
+            }
+
+            function logout() {
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            }
+
+            onMounted(async () => {
+                try {
+                    await loadUser();
+                    if (activeOption.value === 3 || activeOption.value === 4) {
+                        await loadMyForms();
+                    }
+                } catch (e) {
+                    errorMsg.value = e?.message || '加载失败';
+                }
+            });
+
+            return {
+                user,
+                activeOption,
+                myForms,
+                dormInfo,
+                deviceType,
+                description,
+                uploadImage,
+                selectedFileName,
+                onFileChange,
+                oldPassword,
+                newPassword,
+                rePassword,
+                errorMsg,
+                successMsg,
+                loading,
+                statusText,
+                statusTagClass,
+                chooseOption,
+                handleUpdateDorm,
+                handleInsertForm,
+                resetCreateForm,
+                loadMyForms,
+                handleCancelForm,
+                handleUpdatePwd,
+                logout
+            };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
+
