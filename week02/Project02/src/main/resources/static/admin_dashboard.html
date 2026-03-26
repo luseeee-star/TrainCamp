@@ -167,6 +167,39 @@
             border: 1px solid #eee;
             margin-top: 10px;
             display: block;
+            cursor: zoom-in;
+        }
+        .modal-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 9999;
+        }
+        .modal-card {
+            background: #111;
+            border-radius: 10px;
+            padding: 10px;
+            max-width: min(1100px, 95vw);
+            max-height: 90vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        }
+        .modal-img {
+            display: block;
+            max-width: min(1080px, 92vw);
+            max-height: 86vh;
+            object-fit: contain;
+            border-radius: 8px;
+            cursor: zoom-out;
+        }
+        .modal-hint {
+            color: #ddd;
+            font-size: 12px;
+            margin-top: 8px;
+            text-align: center;
         }
         .kv {
             display: grid;
@@ -310,6 +343,7 @@
                                 class="img"
                                 :src="formatImgUrl(detailForm.img_url || detailForm.imgUrl)"
                                 alt="报修图片"
+                                @click="openImagePreview(formatImgUrl(detailForm.img_url || detailForm.imgUrl))"
                             />
                         </div>
                     </div>
@@ -418,6 +452,23 @@
             </div>
         </div>
     </div>
+
+    <!-- 图片放大预览（必须放在 #app 内，v-if 才会生效） -->
+    <div
+        v-if="isPreviewOpen"
+        class="modal-mask"
+        @click.self="closeImagePreview"
+    >
+        <div class="modal-card">
+            <img
+                class="modal-img"
+                :src="previewUrl"
+                alt="放大预览"
+                @click="closeImagePreview"
+            />
+            <div class="modal-hint">点击图片/空白处或按 ESC 关闭</div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -436,6 +487,8 @@
             const detailForm = ref(null);
 
             const updateStatusMap = ref({});
+                    const isPreviewOpen = ref(false);
+                    const previewUrl = ref('');
 
             const oldPassword = ref('');
             const newPassword = ref('');
@@ -475,6 +528,17 @@
                 if (s.startsWith('/')) return BASE_URL + s;
                 // 兜底：拼接为 http://localhost:8080/<imgUrl>
                 return BASE_URL + '/' + s;
+            }
+
+            function openImagePreview(url) {
+                if (!url) return;
+                previewUrl.value = url;
+                isPreviewOpen.value = true;
+            }
+
+            function closeImagePreview() {
+                isPreviewOpen.value = false;
+                previewUrl.value = '';
             }
 
             async function apiCall(url, method, data) {
@@ -733,6 +797,11 @@
                 } catch (e) {
                     errorMsg.value = e?.message || '加载失败';
                 }
+                window.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Escape' && isPreviewOpen.value) {
+                        closeImagePreview();
+                    }
+                });
             });
 
             return {
@@ -752,6 +821,10 @@
                 statusText,
                 statusTagClass,
                 formatImgUrl,
+                isPreviewOpen,
+                previewUrl,
+                openImagePreview,
+                closeImagePreview,
                 chooseOption,
                 listMode,
                 chooseListMode,

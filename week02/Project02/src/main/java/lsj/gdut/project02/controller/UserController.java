@@ -38,7 +38,6 @@ public class UserController {
             map.put("userid",userid);
             map.put("status",user.getRole());
             String token = JwtUtil.createToken(map);
-
             return ResultJson.success(token);
         }else{
             return ResultJson.error("账号或密码错误");

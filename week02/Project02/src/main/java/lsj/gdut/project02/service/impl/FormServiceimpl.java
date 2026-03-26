@@ -49,6 +49,7 @@ public class FormServiceimpl implements FormService {
         //0是未维修，1是维修中，2是已完成
         form.setStatus(0);
         form.setUpdate_time(upodate_time);
+        form.setImg_url(img_url);
         formMapper.InsertForm(form);
     }
 

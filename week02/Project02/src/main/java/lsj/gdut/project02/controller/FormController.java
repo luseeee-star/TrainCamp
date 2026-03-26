@@ -42,7 +42,7 @@ public class FormController {
             String fileName = UUID.randomUUID()+originalfileName.substring(originalfileName.lastIndexOf("."));
             file.transferTo(new File("D:\\Java\\TrainCamp\\week02\\Project02\\msg\\"+ fileName));
             String img_url = null;
-            img_url = "localhost:8080/msg/"+fileName;
+            img_url = "http://localhost:8080/msg/"+fileName;
 
             formServiceimpl.InsertForm(userid,device_type,description,img_url);
         }else{
