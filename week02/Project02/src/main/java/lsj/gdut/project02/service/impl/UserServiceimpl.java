@@ -72,14 +72,13 @@ public class UserServiceimpl implements UserService {
             System.out.println("请输入新宿舍信息：栋-房间号，如：01-101");
         }
         //判断宿舍信息合不合法
-        boolean isLegal = dormInfo.matches("[0-1]\\d-\\d{3}");
+        boolean isLegal = dormInfo.matches("^[西东][0-1]\\d-\\d{3}");
         if (isLegal) {
             //第一次登录，绑定宿舍
             user.setDorm_info(dormInfo);
             userMapper.UpdateUser(user);
             return true;
         } else {
-            System.out.println("宿舍不存在");
             return false;
         }
     }

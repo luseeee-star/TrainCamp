@@ -95,7 +95,14 @@ public class UserController {
         user.setUserid(userid);
         String dormInfo = map.get("dormInfo");
         user.setDorm_info(dormInfo);
-        userServiceimpl.UpdateUser(user);
-        return ResultJson.success("修改成功");
+        //判断用户宿舍格式是否合法
+        if (user.getDorm_info().matches("^[西东][0-1]\\d-\\d{3}")) {
+            //第一次登录，绑定宿舍
+            user.setDorm_info(user.getDorm_info());
+            userServiceimpl.UpdateUser(user);
+            return ResultJson.success("更新成功");
+        } else {
+            return ResultJson.error("宿舍格式有误");
+        }
     }
 }
