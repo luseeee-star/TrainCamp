@@ -3,6 +3,7 @@ package lsj.gdut.project02.pojo;
 public class Form {
     private Integer id;
     String userid;
+    String dorm_info;
     String device_type;
     String description;
     private Integer status;//0是未维修，1是维修中，2是已完成
@@ -13,9 +14,10 @@ public class Form {
     public Form() {
     }
 
-    public Form(Integer id, String userid, String device_type, String description, Integer status, String update_time, String img_url) {
+    public Form(Integer id, String userid, String dorm_info, String device_type, String description, Integer status, String update_time, String img_url) {
         this.id = id;
         this.userid = userid;
+        this.dorm_info = dorm_info;
         this.device_type = device_type;
         this.description = description;
         this.status = status;
@@ -53,6 +55,22 @@ public class Form {
      */
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    /**
+     * 获取
+     * @return dorm_info
+     */
+    public String getDorm_info() {
+        return dorm_info;
+    }
+
+    /**
+     * 设置
+     * @param dorm_info
+     */
+    public void setDorm_info(String dorm_info) {
+        this.dorm_info = dorm_info;
     }
 
     /**
@@ -136,6 +154,6 @@ public class Form {
     }
 
     public String toString() {
-        return "Form{id = " + id + ", userid = " + userid + ", device_type = " + device_type + ", description = " + description + ", status = " + status + ", update_time = " + update_time + ", img_url = " + img_url + "}";
+        return "Form{id = " + id + ", userid = " + userid + ", dorm_info = " + dorm_info + ", device_type = " + device_type + ", description = " + description + ", status = " + status + ", update_time = " + update_time + ", img_url = " + img_url + "}";
     }
 }

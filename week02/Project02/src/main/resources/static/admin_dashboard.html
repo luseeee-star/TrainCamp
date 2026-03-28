@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>管理员菜单 - 宿舍报修管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="http.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         body {
@@ -327,6 +329,7 @@
                         <div class="kv">
                             <div class="k">id</div><div class="v">{{ detailForm.id }}</div>
                             <div class="k">账号</div><div class="v">{{ detailForm.userid }}</div>
+                            <div class="k">宿舍信息</div><div class="v">{{ detailForm.dorm_info || '-' }}</div>
                             <div class="k">设备类型</div><div class="v">{{ detailForm.device_type }}</div>
                             <div class="k">描述</div><div class="v">{{ detailForm.description }}</div>
                             <div class="k">状态</div><div class="v">{{ statusText(detailForm.status) }}</div>
@@ -476,7 +479,6 @@
 
     createApp({
         setup() {
-            const BASE_URL = 'http://localhost:8080';
             const user = ref(null);
             const activeOption = ref(0);
             const allForms = ref([]);
@@ -515,6 +517,7 @@
             }
 
             function formatImgUrl(imgUrl) {
+                const BASE_URL = 'http://localhost:8080';
                 if (!imgUrl) return '';
                 const s = String(imgUrl).trim();
                 if (s === '') return '';
@@ -542,24 +545,7 @@
             }
 
             async function apiCall(url, method, data) {
-                const token = localStorage.getItem('token');
-                const headers = { 'Content-Type': 'application/json' };
-                if (token) headers['Authorization'] = token;
-
-                const options = { method, headers };
-                if (data !== undefined) options.body = JSON.stringify(data);
-
-                const resp = await fetch(BASE_URL + url, options);
-                if (resp.status === 401) {
-                    localStorage.removeItem('token');
-                    alert('登录已过期，请重新登录');
-                    window.location.href = 'login.html';
-                    throw new Error('Unauthorized');
-                }
-                if (!resp.ok) {
-                    throw new Error(`HTTP Error: ${resp.status}`);
-                }
-                return await resp.json();
+                return await window.httpClient.request(url, method, data);
             }
 
             async function loadUser() {

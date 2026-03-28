@@ -37,13 +37,14 @@ public class FormServiceimpl implements FormService {
     @Override
     @Transactional
     //新建保修单
-    public void InsertForm(String userid,String device_type,String description,String img_url){
+    public void InsertForm(String userid,String dorm_info,String device_type,String description,String img_url){
         //通过时间库来获取当前时间
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm");
         String upodate_time = now.format(formatter);
         Form form = new Form();
         form.setUserid(userid);
+        form.setDorm_info(dorm_info);
         form.setDevice_type(device_type);
         form.setDescription(description);
         //0是未维修，1是维修中，2是已完成

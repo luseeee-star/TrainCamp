@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>学生菜单 - 宿舍报修管理系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="http.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <style>
         body {
@@ -192,7 +194,7 @@
                 <h2 style="margin:0 0 12px 0;">绑定/修改宿舍</h2>
                 <div class="field">
                     <label class="label">宿舍信息</label>
-                    <input type="text" v-model="dormInfo" placeholder="例如：A-301 / 3号楼-301 等" />
+                    <input type="text" v-model="dormInfo" placeholder="例如：西01-101 等" />
                 </div>
                 <button :disabled="loading" @click="handleUpdateDorm">
                     {{ loading ? '提交中...' : '提交修改' }}
@@ -339,7 +341,6 @@
 
     createApp({
         setup() {
-            const BASE_URL = 'http://localhost:8080';
             const user = ref(null);
             const activeOption = ref(0);
             const myForms = ref([]);
@@ -376,46 +377,14 @@
             }
 
             async function apiCall(url, method, data) {
-                const token = localStorage.getItem('token');
-                const headers = { 'Content-Type': 'application/json' };
-                if (token) headers['Authorization'] = token;
-
-                const options = { method, headers };
-                if (data !== undefined) options.body = JSON.stringify(data);
-
-                const resp = await fetch(BASE_URL + url, options);
-                if (resp.status === 401) {
-                    localStorage.removeItem('token');
-                    alert('登录已过期，请重新登录');
-                    window.location.href = 'login.html';
-                    throw new Error('Unauthorized');
-                }
-                if (!resp.ok) {
-                    throw new Error(`HTTP Error: ${resp.status}`);
-                }
-                return await resp.json();
+                return await window.httpClient.request(url, method, data);
             }
 
             async function apiCallFormData(url, method, formData) {
-                const token = localStorage.getItem('token');
-                const headers = {};
-                if (token) headers['Authorization'] = token;
-
-                const resp = await fetch(BASE_URL + url, {
-                    method: method,
-                    headers: headers,
-                    body: formData
-                });
-                if (resp.status === 401) {
-                    localStorage.removeItem('token');
-                    alert('登录已过期，请重新登录');
-                    window.location.href = 'login.html';
-                    throw new Error('Unauthorized');
+                if ((method || 'POST').toUpperCase() !== 'POST') {
+                    return await window.httpClient.request(url, method, formData);
                 }
-                if (!resp.ok) {
-                    throw new Error(`HTTP Error: ${resp.status}`);
-                }
-                return await resp.json();
+                return await window.httpClient.upload(url, formData);
             }
 
             async function loadUser() {

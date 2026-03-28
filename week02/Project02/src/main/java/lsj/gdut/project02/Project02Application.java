@@ -1,9 +1,11 @@
 package lsj.gdut.project02;
 
+import jakarta.annotation.PostConstruct;
 import lsj.gdut.project02.pojo.Form;
 import lsj.gdut.project02.pojo.User;
 import lsj.gdut.project02.service.impl.FormServiceimpl;
 import lsj.gdut.project02.service.impl.UserServiceimpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;

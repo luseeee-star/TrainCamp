@@ -33,20 +33,24 @@ public class FormController {
     public ResultJson<String> insert(@RequestParam("device_type") String device_type,
                                       @RequestParam("description") String description,
                                       @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+        //user相关信息从token中获取
         Map<String,Object> claims = ThreadLocalUtil.get();
         String userid = claims.get("userid").toString();
+        User user = userServiceimpl.SelectUserById(userid);
+        String dormInfo = user == null ? null : user.getDorm_info();
 
         //上传图片
         if(file != null){
             String originalfileName = file.getOriginalFilename();
+            //生成随机前缀
             String fileName = UUID.randomUUID()+originalfileName.substring(originalfileName.lastIndexOf("."));
             file.transferTo(new File("D:\\Java\\TrainCamp\\week02\\Project02\\msg\\"+ fileName));
             String img_url = null;
             img_url = "http://localhost:8080/msg/"+fileName;
 
-            formServiceimpl.InsertForm(userid,device_type,description,img_url);
+            formServiceimpl.InsertForm(userid,dormInfo,device_type,description,img_url);
         }else{
-            formServiceimpl.InsertForm(userid,device_type,description,null);
+            formServiceimpl.InsertForm(userid,dormInfo,device_type,description,null);
         }
         return ResultJson.success("success");
     }
