@@ -72,10 +72,15 @@
 <div id="app">
     <div class="container">
         <h1>🏠 宿舍报修管理系统</h1>
+<!--        @submit：监听表单提交事件
+            阻止表单默认的刷新页面行为，改由我们定义的 submitForm 函数处理。
+               -->
         <form @submit.prevent="submitForm">
             <div class="form-group">
                 <label for="userid">账号:</label>
                                 <!-- 通过v-model来实现双向绑定到js数据层-->
+                <!--当你在输入框打字，JS 里的 formData.userid 变量会自动更新。
+                    在 JS 里修改这个变量，输入框显示的文字也会跟着变-->
                 <input type="text" id="userid" v-model="formData.userid" required placeholder="请输入学号或工号">
             </div>
             <div class="form-group">
@@ -84,6 +89,8 @@
             </div>
             <button type="submit">登 录</button>
         </form>
+<!--        v-if="errorMsg": 条件渲染。如果 errorMsg 变量有值，就显示这个 div；
+                            如果没有值，这个标签在 DOM 中根本不存在。-->
         <div class="error" v-if="errorMsg">{{ errorMsg }}</div>
         <div class="link">
             <a href="register.html">没有账号？点击注册</a>
@@ -93,21 +100,32 @@
 
 <script>
     const { createApp, ref } = Vue;
+    //数据交互的发起者
+    //async:异步说明
     async function apiCall(url, method, data) {
+        //等待网络请求完成后，再继续执行后面的代码
         return await window.httpClient.request(url, method, data);
     }
 
     createApp({
         setup() {
+            /*
+            * ref: 是 Vue 实现“响应式”和“双向绑定”的基石
+            * 这是 Vue 3 的核心。在后端你可能定义一个普通的 String，
+            * 但在前端，如果你希望变量改变时页面自动更新，就必须用 ref 包装它。
+            注意：在 JS 中修改/读取它的值需要加 .value（如 errorMsg.value = '...'），
+            * 但在 HTML 模板中直接写 errorMsg 即可。
+             */
             const formData = ref({ userid: '', password: '' });
             const errorMsg = ref('');
             const loading = ref(false);
 
+            //异步请求
             const submitForm = async () => {
                 errorMsg.value = '';
                 loading.value = true;
 
-                try {
+                try {                                                     //发送给后端
                     const result = await apiCall('/Users/login', 'POST', formData.value);
 
                     // 检查业务逻辑的 code

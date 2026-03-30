@@ -1,0 +1,46 @@
+2026-03-30 12:10:11.214 [main] INFO  l.g.project02.Project02Application - Starting Project02Application using Java 21.0.10 with PID 27692 (D:\Java\TrainCamp\week02\Project02\target\classes started by LSJ in D:\Java\TrainCamp)
+2026-03-30 12:10:11.215 [main] DEBUG l.g.project02.Project02Application - Running with Spring Boot v3.3.9, Spring v6.1.17
+2026-03-30 12:10:11.215 [main] INFO  l.g.project02.Project02Application - No active profile set, falling back to 1 default profile: "default"
+2026-03-30 12:10:11.853 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-03-30 12:10:11.863 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-03-30 12:10:11.865 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-03-30 12:10:11.865 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2026-03-30 12:10:11.901 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-03-30 12:10:11.902 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 658 ms
+2026-03-30 12:10:12.312 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-03-30 12:10:12.324 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-03-30 12:10:12.328 [main] INFO  l.g.project02.Project02Application - Started Project02Application in 1.435 seconds (process running for 2.077)
+2026-03-30 12:10:32.419 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-03-30 12:10:32.419 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-03-30 12:10:32.420 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-03-30 12:10:32.489 [http-nio-8080-exec-2] INFO  l.g.p.controller.UserController - 用户 3125001001 尝试登录
+2026-03-30 12:10:32.490 [http-nio-8080-exec-2] DEBUG l.g.p.service.impl.UserServiceimpl - 查询用户: 3125001001
+2026-03-30 12:10:32.501 [http-nio-8080-exec-2] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-03-30 12:10:32.604 [http-nio-8080-exec-2] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@303b4234
+2026-03-30 12:10:32.606 [http-nio-8080-exec-2] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-03-30 12:10:32.608 [http-nio-8080-exec-2] DEBUG l.g.p.mapper.UserMapper.SelectUser - ==>  Preparing: select * from sys_user where userid = ? and password = ?;
+2026-03-30 12:10:32.629 [http-nio-8080-exec-2] DEBUG l.g.p.mapper.UserMapper.SelectUser - ==> Parameters: 3125001001(String), 123456(String)
+2026-03-30 12:10:32.648 [http-nio-8080-exec-2] DEBUG l.g.p.mapper.UserMapper.SelectUser - <==      Total: 1
+2026-03-30 12:10:32.669 [http-nio-8080-exec-2] INFO  l.g.p.controller.UserController - 用户 3125001001 登录成功
+2026-03-30 12:10:32.748 [http-nio-8080-exec-5] DEBUG l.g.p.intercepters.LoginInterceptor - 处理跨域预检请求 (OPTIONS)
+2026-03-30 12:10:32.769 [http-nio-8080-exec-4] INFO  l.g.p.intercepters.LoginInterceptor - 用户 3125001001 (角色: 学生) 认证成功, 访问路径: /Users/userinfo
+2026-03-30 12:10:32.770 [http-nio-8080-exec-4] DEBUG l.g.p.controller.UserController - 用户 3125001001 查询个人信息
+2026-03-30 12:10:32.770 [http-nio-8080-exec-4] DEBUG l.g.p.service.impl.UserServiceimpl - 按ID查询用户: 3125001001
+2026-03-30 12:10:32.770 [http-nio-8080-exec-4] DEBUG l.g.p.m.UserMapper.SelectUserById - ==>  Preparing: select * from sys_user where userid = ?
+2026-03-30 12:10:32.771 [http-nio-8080-exec-4] DEBUG l.g.p.m.UserMapper.SelectUserById - ==> Parameters: 3125001001(String)
+2026-03-30 12:10:32.772 [http-nio-8080-exec-4] DEBUG l.g.p.m.UserMapper.SelectUserById - <==      Total: 1
+2026-03-30 12:10:32.780 [http-nio-8080-exec-3] DEBUG l.g.p.intercepters.LoginInterceptor - 处理跨域预检请求 (OPTIONS)
+2026-03-30 12:10:32.781 [http-nio-8080-exec-6] INFO  l.g.p.intercepters.LoginInterceptor - 用户 3125001001 (角色: 学生) 认证成功, 访问路径: /Forms/selectForms
+2026-03-30 12:10:32.782 [http-nio-8080-exec-6] DEBUG l.g.p.controller.FormController - 用户 3125001001 查询个人报修单列表
+2026-03-30 12:10:32.782 [http-nio-8080-exec-6] DEBUG l.g.p.service.impl.FormServiceimpl - 查询用户 3125001001 的报修单
+2026-03-30 12:10:32.795 [http-nio-8080-exec-6] DEBUG l.g.p.mapper.FormMapper.SelectAll - ==>  Preparing: select * from repair_form WHERE userid = ? ;
+2026-03-30 12:10:32.797 [http-nio-8080-exec-6] DEBUG l.g.p.mapper.FormMapper.SelectAll - ==> Parameters: 3125001001(String)
+2026-03-30 12:10:32.799 [http-nio-8080-exec-6] DEBUG l.g.p.mapper.FormMapper.SelectAll - <==      Total: 3
+2026-03-30 12:10:54.005 [http-nio-8080-exec-7] INFO  l.g.p.intercepters.LoginInterceptor - 用户 3125001001 (角色: 学生) 认证成功, 访问路径: /Forms/selectForms
+2026-03-30 12:10:54.006 [http-nio-8080-exec-7] DEBUG l.g.p.controller.FormController - 用户 3125001001 查询个人报修单列表
+2026-03-30 12:10:54.006 [http-nio-8080-exec-7] DEBUG l.g.p.service.impl.FormServiceimpl - 查询用户 3125001001 的报修单
+2026-03-30 12:10:54.006 [http-nio-8080-exec-7] DEBUG l.g.p.mapper.FormMapper.SelectAll - ==>  Preparing: select * from repair_form WHERE userid = ? ;
+2026-03-30 12:10:54.006 [http-nio-8080-exec-7] DEBUG l.g.p.mapper.FormMapper.SelectAll - ==> Parameters: 3125001001(String)
+2026-03-30 12:10:54.007 [http-nio-8080-exec-7] DEBUG l.g.p.mapper.FormMapper.SelectAll - <==      Total: 3
+2026-03-30 12:11:01.804 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-03-30 12:11:01.807 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
