@@ -10,9 +10,10 @@
     baseURL: BASE_URL,
     timeout: 10000
   });
-
+//http.interceptors.request.use：拦截从后端返回给前端的那个 Response
   http.interceptors.request.use(
     function (config) {
+      //取出token
       const token = localStorage.getItem('token');
       if (token) {
         config.headers = config.headers || {};
@@ -25,6 +26,7 @@
     }
   );
 
+  //全局拦截器，如果后端发现 Token 伪造或过期，返回了 401，前端会自动清空本地存储并强制跳转到登录页。
   http.interceptors.response.use(
     function (response) {
       return response;
@@ -44,14 +46,29 @@
     }
   );
 
+  // window 是浏览器的全局对象。
+// 把 httpClient 挂载到 window 上，相当于定义了一个“全局单例工具类”，在任何页面都能直接用。
   window.httpClient = {
     request: function (url, method, data, config) {
+      //参数：
+      //Object.assign 就像是把两个 Map 合并。
+      // 左边是必填项（url, method, data），右边是可选的扩展配置（config）。
+      // config || {} 是个保底：如果你没传第四个参数，就给它一个空对象，防止程序报错。
+      //方法：
+      //调用我们在上面定义好的 axios 实例 (http)
+      // .then(function (resp) { return resp.data; })
+      // 这步最关键：后端返回的是整个 Response（含状态码、Header 等），
+      // 这里直接帮你“拆包”，只把 body 里的数据返回给业务页面(前端)。
       return http.request(Object.assign({
         url: url,
         method: method,
-        data: data
+        data: data  //请求体，后端的@RequestBody接受
       }, config || {})).then(function (resp) { return resp.data; });
     },
+    /**
+     * 专门处理文件上传的方法
+     * 类比后端：处理 MultipartFile
+     */
     upload: function (url, formData, config) {
       return http.request(Object.assign({
         url: url,

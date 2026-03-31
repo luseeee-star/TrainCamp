@@ -130,6 +130,7 @@
 
                     // 检查业务逻辑的 code
                     if (result.code === 200) {
+                        //将token存到由浏览器提供的一个 “本地 KV 数据库”
                         localStorage.setItem('token', result.data);
                         const userid = formData.value.userid;
                         if (userid.startsWith('3125') || userid.startsWith('3225')) {
