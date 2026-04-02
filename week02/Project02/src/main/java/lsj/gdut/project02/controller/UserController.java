@@ -24,8 +24,7 @@ public class UserController {
 
     @Autowired
     private UserServiceimpl userServiceimpl;
-    
-    //------------------------主页面登录-----------------------------
+
     //登录
     @PostMapping("/login")
     public ResultJson<String> Login(@RequestBody LoginDTO logindto){
